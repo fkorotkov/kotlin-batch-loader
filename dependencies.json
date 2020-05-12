@@ -1,0 +1,39 @@
+{
+  "libraries": [
+    {
+      "group": "com.github.fkorotkov.libraries",
+      "name": "com.github.fkorotkov.libraries.gradle.plugin",
+      "version": "1.1"
+    },
+    {
+      "group": "org.jetbrains.kotlin.jvm",
+      "name": "org.jetbrains.kotlin.jvm.gradle.plugin",
+      "version": "1.3.72"
+    },
+    {
+      "group": "org.jetbrains.kotlin",
+      "name": "kotlin-bom",
+      "version": "1.3.72"
+    },
+    {
+      "group": "org.jetbrains.kotlin",
+      "name": "kotlin-scripting-compiler-embeddable",
+      "version": "1.3.72"
+    },
+    {
+      "group": "org.jetbrains.kotlin",
+      "name": "kotlin-test-junit",
+      "version": "1.3.72"
+    },
+    {
+      "group": "org.jetbrains.kotlin",
+      "name": "kotlin-test",
+      "version": "1.3.72"
+    },
+    {
+      "group": "org.jetbrains.kotlinx",
+      "name": "kotlinx-coroutines-core",
+      "version": "1.3.6"
+    }
+  ]
+}
