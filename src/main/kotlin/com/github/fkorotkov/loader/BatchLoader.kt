@@ -20,35 +20,40 @@ class BatchLoader<ID, T>(
 
   private val requests = Channel<LoadRequest<ID, T>>(Channel.UNLIMITED)
 
-  init {
-    repeat(poolSize) {
-      launch(coroutineContext) {
-        while (true) {
-          val requestsToProcess = LinkedList<LoadRequest<ID, T>>()
-          val idsToLoad = HashSet<ID>()
-          val request = requests.receive()
-          requestsToProcess.add(request)
-          idsToLoad.addAll(request.ids)
-          while (idsToLoad.size < keyBatchSizeLimit) {
-            // see if there are more requests to process
-            val additionalRequest = select<LoadRequest<ID, T>?> {
-              requests.onReceive { it }
-              onTimeout(0) { null }
-            } ?: break
-            requestsToProcess.add(additionalRequest)
-            idsToLoad.addAll(additionalRequest.ids)
-          }
-          try {
-            val loadedObjects = delegateLoader.loadByIds(idsToLoad)
-            requestsToProcess.forEach { it.fullFillFrom(loadedObjects) }
-          } catch (e: Exception) {
-            requestsToProcess.forEach { it.result.completeExceptionally(e) }
-          }
+  private inner class RequestWorker {
+    suspend fun start() {
+      while (true) {
+        val requestsToProcess = LinkedList<LoadRequest<ID, T>>()
+        val idsToLoad = HashSet<ID>()
+        val request = requests.receive()
+        requestsToProcess.add(request)
+        idsToLoad.addAll(request.ids)
+        while (idsToLoad.size < keyBatchSizeLimit) {
+          // see if there are more requests to process
+          val additionalRequest = select<LoadRequest<ID, T>?> {
+            requests.onReceive { it }
+            onTimeout(0) { null }
+          } ?: break
+          requestsToProcess.add(additionalRequest)
+          idsToLoad.addAll(additionalRequest.ids)
+        }
+        try {
+          val loadedObjects = delegateLoader.loadByIds(idsToLoad)
+          requestsToProcess.forEach { it.fullFillFrom(loadedObjects) }
+        } catch (e: Exception) {
+          requestsToProcess.forEach { it.result.completeExceptionally(e) }
         }
       }
     }
   }
 
+  init {
+    repeat(poolSize) {
+      launch(coroutineContext) {
+        RequestWorker().start()
+      }
+    }
+  }
 
   override suspend fun loadByIds(ids: Set<ID>): Map<ID, T> {
     val request = LoadRequest<ID, T>(ids)
