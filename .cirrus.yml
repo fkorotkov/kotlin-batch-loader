@@ -9,3 +9,8 @@ check_task:
       - cat dependencies.json
     reupload_on_changes: false
   check_script: gradle check
+  always:
+    junit_result_artifacts:
+      path: "**/test-results/**/*.xml"
+      format: junit
+      type: text/xml
