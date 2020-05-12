@@ -1,0 +1,11 @@
+container:
+  image: gradle:jdk8
+
+check_task:
+  gradle_cache:
+    folder: ~/.gradle/caches
+    fingerprint_script:
+      - echo $GRADLE_VERSION
+      - cat dependencies.json
+    reupload_on_changes: false
+  check_script: gradle check
