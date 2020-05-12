@@ -19,7 +19,7 @@ class BatchLoaderTest {
     val magnitude = regularTime.toLongMilliseconds() / batchedTime.toLongMilliseconds()
     println("Batch loaded in ${batchedTime.toLongMilliseconds()}ms vs ${regularTime.toLongMilliseconds()}ms which is $magnitude times faster!")
     assertTrue(batchedTime < regularTime)
-    assertTrue(magnitude > 5, "Performance improvement is $magnitude")
+    assertTrue(magnitude >= 4, "Performance improvement is $magnitude")
   }
 
   private suspend fun loadTest(loader: Loader<Int, Int>) = coroutineScope {
