@@ -12,7 +12,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class BatchLoader<ID, T>(
-  poolSize: Int = 32,
+  poolSize: Int = 8,
   private val keyBatchSizeLimit: Int = 100,
   private val delegateLoader: Loader<ID, T>
 ) : Loader<ID, T>, CoroutineScope {
