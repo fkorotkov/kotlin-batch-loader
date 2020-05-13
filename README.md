@@ -1,1 +1,1 @@
-# kotlin-batch-loader
+### Code sample for [Buffered batched loading optimization with Kotlin Coroutines and Channels](https://medium.com/@fedor/buffered-batched-loading-optimization-with-kotlin-coroutines-and-channels-412bf39bb3e8) blog post.
