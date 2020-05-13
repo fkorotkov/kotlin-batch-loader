@@ -33,7 +33,7 @@ class BatchLoader<ID, T>(
       while (true) {
         val requestsToProcess = LinkedList<LoadRequest<ID, T>>()
         val idsToLoad = HashSet<ID>()
-        val request = requests.receive()
+        val request = requests.receive() // will "wait" until there is a value
         requestsToProcess.add(request)
         idsToLoad.addAll(request.ids)
         while (idsToLoad.size < keyBatchSizeLimit) {
