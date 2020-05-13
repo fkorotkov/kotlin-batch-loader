@@ -11,6 +11,7 @@ class TestLoader: Loader<Int, Int> {
     // emulate API call in IO context
     return withContext(Dispatchers.IO) {
       // emulate response time from 10ms to 30ms
+      // use Thread#sleep to make the Dispatcher really busy
       Thread.sleep(rand.nextLong(10, 30))
       ids.map { it to it }.toMap()
     }
