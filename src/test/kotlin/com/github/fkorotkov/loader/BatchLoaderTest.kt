@@ -25,10 +25,11 @@ class BatchLoaderTest {
   private suspend fun loadTest(loader: Loader<Int, Int>) = coroutineScope {
     val requests = 3_000
     (1..requests).map { step ->
+      val idToLoad = step % 300
       async {
-        val result = loader.loadByIds(setOf(step))
+        val result = loader.loadByIds(setOf(idToLoad))
         assertEquals(1, result.size)
-        assertEquals(step, result[step])
+        assertEquals(idToLoad, result[idToLoad])
       }
     }.awaitAll()
   }
