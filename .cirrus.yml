@@ -8,7 +8,7 @@ check_task:
       - echo $GRADLE_VERSION
       - cat dependencies.json
     reupload_on_changes: false
-  check_script: gradle check
+  check_script: gradle check --info
   always:
     junit_result_artifacts:
       path: "**/test-results/**/*.xml"
