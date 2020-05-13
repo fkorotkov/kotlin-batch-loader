@@ -30,27 +30,24 @@ class BatchLoader<ID, T>(
         idsToLoad.addAll(request.ids)
         while (idsToLoad.size < keyBatchSizeLimit) {
           // see if there are more requests to process
-          val additionalRequest = select<LoadRequest<ID, T>?> {
-            requests.onReceive { it }
-            onTimeout(0) { null }
-          } ?: break
+          val additionalRequest: LoadRequest<ID, T> =
+            select {
+              requests.onReceive { it }
+              onTimeout(0) { null }
+            } ?: break
           requestsToProcess.add(additionalRequest)
           idsToLoad.addAll(additionalRequest.ids)
         }
         try {
           val loadedObjects = delegateLoader.loadByIds(idsToLoad)
-          requestsToProcess.forEach { it.fullFillFrom(loadedObjects) }
+          requestsToProcess.forEach { processedRequests ->
+            processedRequests.result.complete(
+              loadedObjects.filterKeys { processedRequests.ids.contains(it) }
+            )
+          }
         } catch (e: Exception) {
           requestsToProcess.forEach { it.result.completeExceptionally(e) }
         }
-      }
-    }
-  }
-
-  init {
-    repeat(poolSize) {
-      launch(coroutineContext) {
-        RequestWorker().start()
       }
     }
   }
@@ -65,10 +62,4 @@ class BatchLoader<ID, T>(
 private data class LoadRequest<ID, T>(
   val ids: Set<ID>,
   val result: CompletableDeferred<Map<ID, T>> = CompletableDeferred<Map<ID, T>>()
-) {
-  fun fullFillFrom(loadedObjects: Map<ID, T>) {
-    result.complete(
-      loadedObjects.filterKeys { ids.contains(it) }
-    )
-  }
-}
+)
