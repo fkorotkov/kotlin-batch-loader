@@ -20,6 +20,14 @@ class BatchLoader<ID, T>(
 
   private val requests = Channel<LoadRequest<ID, T>>(Channel.UNLIMITED)
 
+  init {
+    repeat(poolSize) {
+      launch(coroutineContext) {
+        RequestWorker().start()
+      }
+    }
+  }
+
   private inner class RequestWorker {
     suspend fun start() {
       while (true) {
